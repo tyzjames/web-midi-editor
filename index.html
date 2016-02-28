@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+    <meta name="description" content="MorningstarFX Midi Editor" />
+    <script src="controller/controller.js"></script>
+  </head>
+
+  <body ng-app="myApp">
+    <div ng-controller="MidiController as mCtrl">
+      <p>Midi Editor Form</p>
+      <p>Bank: {{currentPreset.bankNumber + 1}}</p>
+      <p>Switch: {{currentPreset.getSwitchLabel()}}</p>
+
+        <form ng-controller='FormController as form'>
+            <label for="presetName">Preset Name: </label>
+            <input id="presetName" type="text" ng-model="currentPreset.presetName" maxlength="6" ng-trim='false'></input>
+            <br/>
+            <div ng-repeat="msg in currentPreset.midiMessages">
+
+                <h4>{{msg.getNumber()}}</h4>
+                <label for="selectMidiType">Type</label>
+                <select name="selectMidiType" id="selectMidiType" ng-model="msg.midiType">
+                    <option value = 0>Empty</option>
+                    <option value = 1>PC Message</option>
+                    <option value = 2>CC Message</option>
+                    <option value = 3>CC Toggle Value</option>
+                    <option value = 4>CC Toggle Hold</option>
+                    <option value = 5>CC Toggle Number</option>
+                    <option value = 6>Note On</option>
+                    <option value = 7>Note Off</option>
+                    <option value = 8>Midi Clock</option>
+                    <option value = 9>Midi Clock Tap Tempo</option>
+                    <option value = 10>Strymon Bank Up</option>
+                    <option value = 11>Strymon Bank Down</option>
+                    <option value = 12>Strymon Scroll Up</option>
+                    <option value = 13>Strymon Scroll Down</option>
+                  </select>
+                  <input type="number" id="selectMidiNumber"/ ng-model="msg.midiNum" min="0" max = "127"/>
+                  <input type="number" id="selectMidiV1" ng-model="msg.midiV1" min="0" max = "127"/>
+                  <input type="number" id="selectMidiV2" ng-model="msg.midiV2" min="0" max = "127"/>
+                  <input type="number" id="selectMidiChannel" ng-model="msg.midiChannel" min="0" max = "16"/>
+              </div>
+            <br/>
+            <input type="submit" ng-click="sendCCMessage()" />
+
+        </form>
+    </div>
+
+  </body>
+
+</html>
