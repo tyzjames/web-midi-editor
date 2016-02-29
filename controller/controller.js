@@ -7,6 +7,7 @@
 
     var midiMessage = function(inType, inNum, inV1, inV2, inChannel) {
         this.number = null;
+		this.name = null;
         this.midiType = inType.toString();
         this.midiNum = inNum;
         this.midiV1 = inV1;
@@ -16,6 +17,10 @@
         this.getNumber = function() {
             return this.number;
         };
+		
+		this.getName = function() {
+			return this.name;
+		};
         this.getArray = function() {
           return [this.midiType, this.midiNum, this.midiV1, this.midiV1, this.midiChannel];
         };
@@ -58,7 +63,8 @@
         };
 
         this.addMidiMsg = function(inMidiMsg) {
-            inMidiMsg.number = "MidiMsg" + (this.midiMessages.length + 1);
+            inMidiMsg.name = "Midi Message " + (this.midiMessages.length + 1);
+			inMidiMsg.number = (this.midiMessages.length + 1)
             this.midiMessages.push(inMidiMsg);
         };
 

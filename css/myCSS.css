@@ -1,0 +1,55 @@
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 300px;
+  padding-right: 300px;
+  text-align: center;
+ 
+}
+
+
+.bankswitchheader {
+	text-align: center;
+}
+.midiMsgHead {
+	font-weight: bold;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+[class*="col-"] {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left:0;
+  padding-right:0;
+  margin-top:1px;
+  margin-bottom:1px;
+}
+
+.std-grid {
+  text-align: "center";
+  background-color: rgba(122,122,122,.15);
+  border: 3px solid white;
+}
+
+.container-fixed {
+	width:100%;
+	}
+
+#submitButton {
+	position: relative;
+	right:50px;
+}
+
+.form {
+	height:50px;
+}
+
+.col-height {
+	height: 70px;
+}
+
+.presetRow {
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
