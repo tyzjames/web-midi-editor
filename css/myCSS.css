@@ -1,10 +1,10 @@
 body {
   padding-top: 20px;
   padding-bottom: 20px;
-  padding-left: 300px;
-  padding-right: 300px;
+  padding-left: 200px;
+  padding-right: 200px;
   text-align: center;
- 
+
 }
 
 
@@ -18,8 +18,8 @@ body {
 }
 
 [class*="col-"] {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   padding-left:0;
   padding-right:0;
   margin-top:1px;
@@ -46,10 +46,14 @@ body {
 }
 
 .col-height {
-	height: 70px;
+	height: 50px;
 }
 
 .presetRow {
 	padding-top: 1px;
 	padding-bottom: 1px;
+}
+
+.form-num {
+  position:relative;width:60%;left:30px;bottom:5px;
 }

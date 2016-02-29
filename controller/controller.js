@@ -17,7 +17,7 @@
         this.getNumber = function() {
             return this.number;
         };
-		
+
 		this.getName = function() {
 			return this.name;
 		};
@@ -91,7 +91,7 @@
                 output.send([0xC0, 0]); //PC#0 to start transmission, channel 1
                 output.send([0xb1, bankNum, swNum]); //CC Num for Bank and Switch number, channel 2
                 for (var i = 0; i < arrayToSend.length; i++) {
-                    ccMsg = [0xb3, 1, arrayToSend[i]];
+                    ccMsg = [0xb3, i, arrayToSend[i]];
                     output.send(ccMsg);
                 }
 
