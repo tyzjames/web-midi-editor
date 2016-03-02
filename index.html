@@ -22,84 +22,96 @@
             MorningstarFX Midi Editor <span class="label label-default" style="position:relative;top:-3px;">Beta</span>
          </h2>
       </header>
-      <main ng-controller="MidiController as mCtrl">
-         <div class="bankswitchheader">
-            <div class="col-xs-6 std-grid">Bank <br>
-               <strong>
-               <font size="100px">
-               {{currentPreset.bankNumber + 1}}
-               </font>
-               </strong>
-            </div>
-            <div class="col-xs-6 std-grid">Switch<br>
-               <strong>
-               <font size="100px">
-               {{currentPreset.getSwitchLabel()}}
-               </font>
-               </strong>
-            </div>
+      <main ng-controller="MidiController as mCtrl" >
+         <div class="col-xs-12" ng-hide="mCtrl.midiController_isConnected">
+            <h3 style="color:red;">
+               No controllers found. Please connect your MorningstarFX Midi Controller and click refresh.
+            </h3>
          </div>
-         <div>
-            <form ng-controller='FormController as form'>
-                      <div class="input-group" style="width:50%;text-align:position:relative;left:220px;top:5px;margin-top:10px;margin-bottom:10px;">
-                        <span class="input-group-addon" id="basic-addon3">Preset Name</span>
-                        <input type="text" class="form-control" id="presetName" aria-describedby="basic-addon3" ng-model="currentPreset.presetName" maxlength="6" ng-trim='false'>
-                        <span class="input-group-btn">
-                          <button class="btn btn-default" type="submit" ng-click="sendCCMessage()">Submit</button>
-                        </span>
-                      </div>
-               <div class="midiMsgHead">
-                  <div class="col-xs-1 std-grid">MidiMsg</div>
-                  <div class="col-xs-3 std-grid">Type</div>
-                  <div class="col-xs-2 std-grid">Number</div>
-                  <div class="col-xs-2 std-grid">V1</div>
-                  <div class="col-xs-2 std-grid">V2</div>
-                  <div class="col-xs-2 std-grid">Channel</div>
+         <div class="col-xs-12" ng-show="mCtrl.browserMidiCompatible">
+            <h3 style="color:red;">
+               Incompatible browser detected. Please use Google Chrome.
+            </h3>
+         </div>
+         <div ng-show="mCtrl.midiController_isConnected">
+            <div>
+               <div class="col-xs-6 sub-header">Bank <br>
+                  <strong>
+                  <font size="100px">
+                  {{currentPreset.bankNumber + 1}}
+                  </font>
+                  </strong>
                </div>
-               <br/>
-               <div class="form" ng-repeat="msg in currentPreset.midiMessages">
-                  <div class="col-xs-1 col-height std-grid">
-                     <p>{{msg.getNumber()}}</p>
-                  </div>
-                  <div class="col-xs-3 col-height std-grid">
-                     <select name="selectMidiType" class="form-control btn-sm" id="selectMidiType" ng-model="msg.midiType" style="position:relative;width:80%;left:20px;bottom:5px;">
-                        <option value = 0>Empty</option>
-                        <option value = 1>PC Message</option>
-                        <option value = 2>CC Message</option>
-                        <option value = 3>CC Toggle Value</option>
-                        <option value = 4>CC Toggle Hold</option>
-                        <option value = 5>CC Toggle Number</option>
-                        <option value = 6>Note On</option>
-                        <option value = 7>Note Off</option>
-                        <option value = 8>Midi Clock</option>
-                        <option value = 9>Midi Clock Tap Tempo</option>
-                        <option value = 10>Strymon Bank Up</option>
-                        <option value = 11>Strymon Bank Down</option>
-                        <option value = 12>Strymon Scroll Up</option>
-                        <option value = 13>Strymon Scroll Down</option>
-                     </select>
-                  </div>
-                  <div class="col-xs-2 col-height std-grid">
-                     <input type="number" class="form-control form-num" id="selectMidiNumber" ng-model="msg.midiNum" min="0" max = "127"/>
-                  </div>
-                  <div class="col-xs-2 col-height  std-grid">
-                     <input type="number" class="form-control form-num" id="selectMidiV1" ng-model="msg.midiV1" min="0" max = "127"/>
-                  </div>
-                  <div class="col-xs-2 col-height  std-grid">
-                     <input type="number" class="form-control form-num" id="selectMidiV2" ng-model="msg.midiV2" min="0" max = "127"/>
-                  </div>
-                  <div class="col-xs-2 col-height  std-grid">
-                     <input type="number" class="form-control form-num" id="selectMidiChannel" ng-model="msg.midiChannel" min="0" max = "16"/>
-                  </div>
+               <div class="col-xs-6">Switch<br>
+                  <strong>
+                  <font size="100px">
+                  {{currentPreset.getSwitchLabel()}}
+                  </font>
+                  </strong>
                </div>
-               <br/>
-            </form>
+            </div>
+            <div>
+               <form ng-controller='FormController as form'>
+                  <div class="col-xs-12 input-group preset-name">
+                     <span class="input-group-addon" id="basic-addon3">Preset Name</span>
+                     <input type="text" class="form-control" id="presetName" aria-describedby="basic-addon3" ng-model="currentPreset.presetName" maxlength="6" ng-trim='false'>
+                     <span class="input-group-btn">
+                     <button class="btn btn-default" type="submit" ng-click="sendCCMessage()">Save</button>
+                     </span>
+                  </div>
+                  <div>
+                     <h4 class="col-xs-1">Msg</h4>
+                     <h4 class="col-xs-3">Type</h4>
+                     <h4 class="col-xs-2">Number</h4>
+                     <h4 class="col-xs-2">V1</h4>
+                     <h4 class="col-xs-2">V2</h4>
+                     <h4 class="col-xs-2">Channel</h4>
+                  </div>
+                  <br/>
+                  <div ng-repeat="msg in currentPreset.midiMessages">
+                     <div class="col-xs-1 col-height">
+                        <p>{{msg.getNumber()}}</p>
+                     </div>
+                     <div class="col-xs-3 col-height">
+                        <select name="selectMidiType" class="form-control btn-sm select-type" ng-model="msg.midiType">
+                           <option value = 0>Empty</option>
+                           <option value = 1>PC Message</option>
+                           <option value = 2>CC Message</option>
+                           <option value = 3>CC Toggle Value</option>
+                           <option value = 4>CC Toggle Hold</option>
+                           <option value = 5>CC Toggle Number</option>
+                           <option value = 6>Note On</option>
+                           <option value = 7>Note Off</option>
+                           <option value = 8>Midi Clock</option>
+                           <option value = 9>Midi Clock Tap Tempo</option>
+                           <option value = 10>Strymon Bank Up</option>
+                           <option value = 11>Strymon Bank Down</option>
+                           <option value = 12>Strymon Scroll Up</option>
+                           <option value = 13>Strymon Scroll Down</option>
+                        </select>
+                     </div>
+                     <div class="col-xs-2 col-height">
+                        <input type="number" class="form-control form-num" id="selectMidiNumber" ng-model="msg.midiNum" min="0" max = "127"/>
+                     </div>
+                     <div class="col-xs-2 col-height">
+                        <input type="number" class="form-control form-num" id="selectMidiV1" ng-model="msg.midiV1" min="0" max = "127"/>
+                     </div>
+                     <div class="col-xs-2 col-height">
+                        <input type="number" class="form-control form-num" id="selectMidiV2" ng-model="msg.midiV2" min="0" max = "127"/>
+                     </div>
+                     <div class="col-xs-2 col-height">
+                        <input type="number" class="form-control form-num" id="selectMidiChannel" ng-model="msg.midiChannel" min="0" max = "16"/>
+                     </div>
+                  </div>
+                  <br/>
+               </form>
+            </div>
          </div>
       </main>
       <footer>
          <div class="col-xs-12">
-			<p>Morningstarfx 2016</p>
-		</div>
+            <p>Morningstarfx 2016</p>
+         </div>
       </footer>
    </body>
 </html>

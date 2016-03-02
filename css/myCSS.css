@@ -1,20 +1,21 @@
 body {
-  padding-top: 20px;
+  padding-top: 10px;
   padding-bottom: 20px;
   padding-left: 200px;
   padding-right: 200px;
   text-align: center;
-
 }
 
-
-.bankswitchheader {
-	text-align: center;
-}
-.midiMsgHead {
+h4 {
 	font-weight: bold;
 	padding-top: 2px;
 	padding-bottom: 2px;
+	text-decoration:underline;
+}
+
+h1 h2 h3 h4 h5 {
+	padding: 0px 0px 0px 0px;
+	margin: 0px 0px 0px 0px;
 }
 
 [class*="col-"] {
@@ -24,29 +25,30 @@ body {
   padding-right:0;
   margin-top:1px;
   margin-bottom:1px;
-}
-
-.std-grid {
-  text-align: "center";
   background-color: rgba(122,122,122,.15);
   border: 3px solid white;
 }
 
-.container-fixed {
-	width:100%;
-	}
-
-#submitButton {
-	position: relative;
-	right:50px;
-}
-
-.form {
-	height:50px;
-}
-
 .col-height {
 	height: 50px;
+}
+
+.btn-sm {
+	margin-bottom:200px;
+}
+
+.preset-name {
+	background-color:white;
+}
+
+.select-type {
+	position:relative;
+	width:60%;
+	margin: auto auto auto auto;
+	bottom:5px;
+}
+.container-fixed {
+	width:100%;
 }
 
 .presetRow {
@@ -56,4 +58,8 @@ body {
 
 .form-num {
   position:relative;width:60%;left:30px;bottom:5px;
+}
+
+#basic-addon3 {
+	width:10%;
 }
