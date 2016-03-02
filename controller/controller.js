@@ -1,6 +1,7 @@
 (function() {
     var app = angular.module('myApp', []);
     var midiAccess = null;
+	
     app.factory('currentPreset', function() {
         return new midiPreset(0, 0);
     });
@@ -71,9 +72,16 @@
         this.getMidiMsgArray = function() {
             return this.midiMessages;
         };
+		
+		this.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
+        this.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
+		this.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
+		this.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
+		this.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
+		this.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
+		this.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
+		this.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
     };
-
-
 
     app.controller('FormController', ['$scope', 'currentPreset', function($scope, currentPreset) {
 
@@ -103,22 +111,13 @@
 
     app.controller('MidiController', ['$scope', 'currentPreset', function($scope, currentPreset) {
         $scope.browserMidiCompatible = false;
+		$scope.midiController_isConnected = false;
         var connectedDevices = [];
         angular.element(document).ready(function() {
             console.log("Ready");
             midiInit();
         });
         $scope.currentPreset = currentPreset;
-
-        $scope.currentPreset.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
-        $scope.currentPreset.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
-        $scope.currentPreset.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
-        $scope.currentPreset.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
-        $scope.currentPreset.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
-        $scope.currentPreset.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
-        $scope.currentPreset.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
-        $scope.currentPreset.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
-
 
         function midiInit() {
             if (navigator.requestMIDIAccess) {
@@ -157,9 +156,11 @@
                 $scope.device = {};
                 //console.log(connectedDevices);
             }
+			$scope.midiController_isConnected = true;
         }
 
         function onMIDIReject(err) {
+			$scope.midiController_isConnected = false;
             console.log("Midi reject.");
         }
 
