@@ -1,7 +1,7 @@
 (function() {
     var app = angular.module('myApp', []);
     var midiAccess = null;
-	
+
     app.factory('currentPreset', function() {
         return new midiPreset(0, 0);
     });
@@ -72,7 +72,7 @@
         this.getMidiMsgArray = function() {
             return this.midiMessages;
         };
-		
+
 		this.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
         this.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
 		this.addMidiMsg(new midiMessage(0, 0, 0, 0, 0));
@@ -124,7 +124,7 @@
                 $scope.$apply(function() {
                     $scope.browserMidiCompatible = true;
                 });
-                console.log("Midi Access granted")
+                console.log("Browser Compatible = true");
                 navigator.requestMIDIAccess().then(onMIDIInit, onMIDIReject);
             } else {
                 console.log("No MIDI support found.");
@@ -147,6 +147,7 @@
             }
 
             for (entry of midiAccess.inputs) {
+
                 var input = entry[1];
                 //for (var i = 0; i < midiAccess.inputs.length; i++) {
                 //var input = midiAccess.inputs[1];
@@ -154,9 +155,12 @@
                 $scope.device.name = input.name;
                 connectedDevices.push($scope.device);
                 $scope.device = {};
-                //console.log(connectedDevices);
+                console.log(connectedDevices);
             }
-			$scope.midiController_isConnected = true;
+            $scope.$apply(function() {
+                $scope.midiController_isConnected = true;
+                console.log($scope.midiController_isConnected);
+            })
         }
 
         function onMIDIReject(err) {
@@ -173,6 +177,7 @@
             var midiChannel = (event.data[0] & 0x0f) + 1;
             var midiData_1 = event.data[1];
             var midiData_2 = event.data[2];
+            var editor_start_msg_received = false;
 
             if (midiType === 0xC0) {
                 if (midiData_1 === 0 && midiChannel === 1) {
@@ -180,16 +185,20 @@
                     $scope.midiArray = [];
                     $scope.transmission_isActive = true;
                 } else { //On end of tranmission message
-                    console.log("5.Ending transmission");
-                    $scope.transmission_isActive = false;
-                    $scope.currentPreset.arrayCounter = 0;
-                    $scope.$apply(function() {
-                      parse_array();
-                    });
-
+                    if ($scope.transmission_isActive) {
+                      console.log("5.Ending transmission");
+                      $scope.transmission_isActive = false;
+                      $scope.currentPreset.arrayCounter = 0;
+                      $scope.$apply(function() {
+                        parse_array();
+                      });
+                    } else {
+                      alert("Please boot your device in editor mode!");
+                    }
                 }
             } else if (midiType === 0xB0 && $scope.transmission_isActive) {
                 if (midiChannel === 2) { //Get Bank and Switch info
+                    editor_start_msg_received = true;
                     console.log("2.Receiving Bank and Switch info");
                     $scope.currentPreset.bankNumber = midiData_1;
                     $scope.currentPreset.switchNumber = midiData_2;

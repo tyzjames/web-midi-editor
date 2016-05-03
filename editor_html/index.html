@@ -23,17 +23,17 @@
          </h2>
       </header>
       <main ng-controller="MidiController as mCtrl" >
-         <div class="col-xs-12" ng-hide="mCtrl.midiController_isConnected">
+         <div class="col-xs-12" ng-hide="midiController_isConnected">
             <h3 style="color:red;">
                No controllers found. Please connect your MorningstarFX Midi Controller and click refresh.
             </h3>
          </div>
-         <div class="col-xs-12" ng-show="mCtrl.browserMidiCompatible">
+         <div class="col-xs-12" ng-hide="browserMidiCompatible">
             <h3 style="color:red;">
                Incompatible browser detected. Please use Google Chrome.
             </h3>
          </div>
-         <div ng-show="mCtrl.midiController_isConnected">
+         <div ng-show="midiController_isConnected">
             <div>
                <div class="col-xs-6 sub-header">Bank <br>
                   <strong>
@@ -80,9 +80,10 @@
                            <option value = 3>CC Toggle Value</option>
                            <option value = 4>CC Toggle Hold</option>
                            <option value = 5>CC Toggle Number</option>
+                           <option value = 14>CC Hold Delay</option>
                            <option value = 6>Note On</option>
                            <option value = 7>Note Off</option>
-                           <option value = 8>Midi Clock</option>
+                           <!--<option value = 8>Midi Clock</option>-->
                            <option value = 9>Midi Clock Tap Tempo</option>
                            <option value = 10>Strymon Bank Up</option>
                            <option value = 11>Strymon Bank Down</option>

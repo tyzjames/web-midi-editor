@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <title>Morningstar Web Midi Editor</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+      <!-- Latest compiled and minified JavaScript -->
+      <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>-->
+
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+      <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+      <meta name="description" content="MorningstarFX Midi Editor" />
+      <script src="controller/controller.js"></script>
+      <link href="css/myCSS.css" rel="stylesheet">
+   </head>
+
+   <body ng-app="myApp">
+		<p>
+			For MC6 Firmware v2.01 and above. If you are looking for the v1 editor, please click <a href="http://editor.midimonitor.com">here</a>
+		</p>
+      <header>
+         <h2 class="col-md-12 std-grid">
+            Morningstar Engineering Midi Editor <span class="label label-default" style="position:relative;top:-3px;">Beta</span>
+         </h2>
+
+      </header>
+	  
+      <main ng-controller="MidiController as mCtrl" >
+         <div class="col-md-12" ng-hide="midiController_isConnected || !browserMidiCompatible">
+            <h3 style="color:red;">
+               No controllers found. Please connect your Morningstar Midi Controller and click refresh.
+            </h3>
+         </div>
+         <div class="col-md-12" ng-hide="browserMidiCompatible">
+            <h3 style="color:red;">
+               Incompatible browser detected. Please use Google Chrome.
+            </h3>
+         </div>
+         <div ng-show="midiController_isConnected">
+            <div>
+               <div class="col-md-6 sub-header">Bank <br>
+                  <strong>
+                  <font size="100px">
+                  {{currentPreset.bankNumber + 1}}
+                  </font>
+                  </strong>
+               </div>
+               <div class="col-md-6">Switch<br>
+                  <strong>
+                  <font size="100px">
+                  {{currentPreset.getSwitchLabel()}}
+                  </font>
+                  </strong>
+               </div>
+            </div>
+            <div>
+               <form ng-controller='FormController as form' name="editForm">
+
+                 <div class="col-md-12 input-group preset-name">
+                    <span class="input-group-addon" id="basic-addon3">Bank Full Name</span>
+                    <input type="text" class="form-control" id="bankName" aria-describedby="basic-addon3" ng-model="currentPreset.bankFullName" maxlength="20" ng-trim='false'>
+                    </span>
+                 </div>
+
+                 <div class="col-md-12 input-group preset-name">
+                    <span class="input-group-addon" id="basic-addon3">Preset Full Name</span>
+                    <input type="text" class="form-control" id="presetFullName" aria-describedby="basic-addon3" ng-model="currentPreset.presetFullName" maxlength="16" ng-trim='false'>
+                    </span>
+                 </div>
+
+                  <div class="col-md-12 input-group preset-name">
+                     <span class="input-group-addon" id="basic-addon3">Preset Name</span>
+                     <input type="text" class="form-control" id="presetName" aria-describedby="basic-addon3" ng-model="currentPreset.presetName" maxlength="6" ng-trim='false'>
+                     <span class="input-group-btn">
+                     <button class="btn btn-default" type="submit" ng-click="sendCCMessage()">Save</button>
+                     </span>
+                  </div>
+
+                  <div>
+                     <h4 class="col-md-1">Msg</h4>
+                     <h4 class="col-md-2">Type</h4>
+                     <h4 class="col-md-2">Number 1</h4>
+                     <h4 class="col-md-2">Value 1</h4>
+                     <h4 class="col-md-2">Number 2</h4>
+                     <h4 class="col-md-2">Value 2</h4>
+                     <h4 class="col-md-1">Channel</h4>
+                  </div>
+
+                  <br/>
+                  <div ng-repeat="msg in currentPreset.midiMessages">
+                     <div class="col-md-1 col-height">
+                        <p>{{msg.getNumber()}}</p>
+                     </div>
+                     <div class="col-md-2 col-height">
+                        <select name="selectMidiType" class="form-control btn-sm select-type" ng-model="msg.midiType">
+                           <option value = 0>Empty</option>
+                           <option value = 1>PC Message</option>
+                           <option value = 2>CC Message</option>
+						   <option value = 3>PC Toggle</option>
+                           <option value = 4>CC Toggle</option>
+						   <option value = 5>PC Toggle Hold</option>
+                           <option value = 6>CC Toggle Hold</option>
+                           <option value = 7>CC Hold Delay</option>
+                           <option value = 8>Note On</option>
+                           <option value = 9>Note Off</option>
+                           <option value = 8>Midi Clock</option>
+                           <option value = 11>Midi Clock Tap Tempo</option>
+                           <option value = 12>Strymon Bank Up</option>
+                           <option value = 13>Strymon Bank Down</option>
+                           <option value = 14>Strymon Scroll Up</option>
+                           <option value = 15>Strymon Scroll Down</option>
+                           <option value = 16>MC6 Bank Up</option>
+                           <option value = 17>MC6 Bank Down</option>
+                        </select>
+                     </div>
+                     <div class="col-md-2 col-height">
+                        <input type="number" class="form-control form-num" id="selectMidiNum1" ng-model="msg.midiNum1" required min="0" max = "127"/>
+                     </div>
+                     <div class="col-md-2 col-height">
+                        <input type="number" class="form-control form-num" id="selectMidiV1" ng-model="msg.midiV1" required min="0" max = "127"/>
+                     </div>
+                     <div class="col-md-2 col-height">
+                        <input type="number" class="form-control form-num" id="selectMidiNum2" ng-model="msg.midiNum2" required min="0" max = "127"/>
+                     </div>
+                     <div class="col-md-2 col-height">
+                        <input type="number" class="form-control form-num" id="selectMidiV2" ng-model="msg.midiV2" required min="0" max = "127"/>
+                     </div>
+                     <div class="col-md-1 col-height">
+                        <input type="number" class="form-control form-num" id="selectMidiChannel" ng-model="msg.midiChannel" required min="0" max = "16"/>
+                     </div>
+                  </div>
+                  <br/>
+               </form>
+            </div>
+         </div>
+      </main>
+      <footer>
+         <div class="col-md-12">
+            <p>Morningstar Engineering 2016</p>
+         </div>
+      </footer>
+   </body>
+</html>
