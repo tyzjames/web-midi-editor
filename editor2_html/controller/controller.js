@@ -6,8 +6,33 @@
         return new midiPreset(0, 0);
     });
 
+
+
     var midiMessage = function(inType, inNum1, inNum2, inV1, inV2, inChannel) {
-        this.midiTypeSort = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+        this.midiPresetTypes = [
+          {"id":"0", "name":"Empty", "isExp":"false"},
+          {"id":"1", "name":"PC Message", "isExp":"false"},
+          {"id":"2", "name":"CC Message", "isExp":"false"},
+          {"id":"3", "name":"PC Toggle", "isExp":"false"},
+          {"id":"4", "name":"CC Toggle", "isExp":"false"},
+          {"id":"5", "name":"PC Toggle Hold", "isExp":"false"},
+          {"id":"6", "name":"CC Toggle Hold", "isExp":"false"},
+          {"id":"7", "name":"CC Hold Delay", "isExp":"false"},
+          {"id":"8", "name":"Note On", "isExp":"false"},
+          {"id":"9", "name":"Note Off", "isExp":"false"},
+          {"id":"10", "name":"Midi Clock", "isExp":"false"},
+          {"id":"11", "name":"Midi Clock Tap Tempo", "isExp":"false"},
+          {"id":"12", "name":"Strymon Bank Up", "isExp":"false"},
+          {"id":"13", "name":"Strymon Bank Down", "isExp":"false"},
+          {"id":"14", "name":"Strymon Scroll Up", "isExp":"false"},
+          {"id":"15", "name":"Strymon Scroll Down", "isExp":"false"},
+          {"id":"16", "name":"MC6 Bank Up", "isExp":"false"},
+          {"id":"17", "name":"MC6 Bank Down", "isExp":"false"},
+          {"id":"0", "name":"Empty", "isExp":"true"},
+          {"id":"1", "name":"Expression", "isExp":"true"}
+        ];
+
+        this.midiTypeSort = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
         this.number = null;
 	      this.name = null;
         this.midiType = inType.toString();
@@ -31,6 +56,7 @@
     };
 
     var midiPreset = function(inBank, inSwitch) {
+        this.switchType = "Switch";
         this.switchLabel = ["A","B","C","D","E","F", "G", "H", "I", "J", "K", "L", "M", "N"];
         this.midiMessages = [];
         this.numMidiMessages = 0;
@@ -43,6 +69,14 @@
         this.presetName = "";
         this.presetFullName = "";
         this.bankFullName = "";
+        this.isExp = false;
+
+        this.getMaxNumMidiMessages = function() {
+          if (this.isExp) {
+            return 4;
+          }
+          return 8;
+        }
 
         this.getPresetDataArray = function() {
           var returnArr = [];
@@ -53,13 +87,14 @@
         };
 
         this.getSwitchLabel = function() {
+          if (this.isExp) {
+            return this.switchNumber + 1;
+          }
           return this.switchLabel[this.switchNumber];
         };
 
         this.getPresetShortNameArray = function() {
           var array = [];
-          var spacesToAdd = Math.floor((this.presetShortNameLength - this.presetName)/2);
-          console.log(spacesToAdd);
           for (var i = 0; i < this.presetShortNameLength; i++) {
               if (i < this.presetName.length) {
                   array.push(this.presetName.charAt(i).charCodeAt(0));
@@ -249,9 +284,8 @@
                   $scope.midiPresetNameArray = [];
                   $scope.midiPresetFullNameArray = [];
                   $scope.midiBankNameArray = [];
-
-                  $scope.transmission_isActive = true;
                   currentProgramMode = 1;
+
                 } else if (midiData_1 === 1) {
                   console.log("Ending connection");
                   /*console.log($scope.midiPresetArray);
@@ -263,45 +297,66 @@
                     parse_array();
                   });
                   currentProgramMode = 0;
+
+                } else if (midiData_1 === 2) {
+                  console.log("Sending data");
+                  currentProgramMode = 2;
+
                 } else if (midiData_1 === 20) {
-                  console.log("Receiving preset midi msg data");
+                  //console.log("Receiving preset midi msg data");
                   currentProgramMode = 20;
                 } else if (midiData_1 === 21) {
-                   console.log("Receiving preset name data");
+                   //console.log("Receiving preset name data");
                    currentProgramMode = 21;
                 } else if (midiData_1 === 22) {
-                   console.log("Receiving preset full name data");
+                   //console.log("Receiving preset full name data");
                    currentProgramMode = 22;
                 } else if (midiData_1 === 23) {
-                   console.log("Receiving bank name data");
+                   //console.log("Receiving bank name data");
                    currentProgramMode = 23;
                 }
 
               break;
 
               case 0xB0:
+              if (currentProgramMode === 1) {
+                if (midiData_1 === 1 && midiData_2 === 127) {
+                  $scope.transmission_isActive = true;
+                }
+              }
+
               if ($scope.transmission_isActive) {
-                  if (currentProgramMode === 1) {
-                    if (midiData_1 === 10) {
-                      console.log("Receiving Bank Number");
+                  if (currentProgramMode === 2) {
+                    if (midiData_1 == 9) {
+                      //console.log("Receiving isExp");
+                      if (midiData_2 > 68) {
+                        $scope.currentPreset.isExp = true;
+                        $scope.currentPreset.switchType = "Expression Input";
+                      } else {
+                        $scope.currentPreset.isExp = false;
+                        $scope.currentPreset.switchType = "Switch";
+                      }
+                    } else if (midiData_1 === 10) {
+                      //console.log("Receiving Bank Number");
                       $scope.currentPreset.bankNumber = midiData_2;
                     } else if (midiData_1 === 11) {
-                      console.log("Receiving Preset Number");
+                      //console.log("Receiving Preset Number");
                       $scope.currentPreset.switchNumber = midiData_2;
+                      console.log("Preset Number: " + midiData_2);
                     } else if (midiData_1 === 12) {
-                      console.log("Receiving preset short name length");
+                      //console.log("Receiving preset short name length");
                       $scope.currentPreset.presetShortNameLength = midiData_2;
                     } else if (midiData_1 === 13) {
-                      console.log("Receiving preset full name length");
+                      //console.log("Receiving preset full name length");
                       $scope.currentPreset.presetFullNameLength = midiData_2;
                     } else if (midiData_1 === 14) {
-                      console.log("Receiving preset number of midi messages");
+                      //console.log("Receiving preset number of midi messages");
                       $scope.currentPreset.numMidiMessages = midiData_2;
                     } else if (midiData_1 === 15) {
-                      console.log("Receiving preset midi message size");
+                      //console.log("Receiving preset midi message size");
                       $scope.currentPreset.sizeMidiMessage = midiData_2;
                     } else if (midiData_1 === 16) {
-                      console.log("Receiving Bank Name Size");
+                      //console.log("Receiving Bank Name Size");
                       $scope.currentPreset.bankNameLength = midiData_2;
                     } else if (midiData_1 === 20) {
 
