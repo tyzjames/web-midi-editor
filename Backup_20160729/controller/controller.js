@@ -148,7 +148,8 @@
         {"id":"15", "name":"MC6 Bank Up", "isExp":"false"},
         {"id":"16", "name":"MC6 Bank Down", "isExp":"false"},
         {"id":"17", "name":"Conditional Type", "isExp":"false"},
-		{"id":"18", "name":"System Real Time", "isExp":"false"},
+	{"id":"18", "name":"System Real Time", "isExp":"false"},
+	{"id":"19", "name":"AxeFX Tuner (Testing)", "isExp":"false"},
         {"id":"0", "name":"Empty", "isExp":"true"},
         {"id":"1", "name":"Expression", "isExp":"true"}
       ];

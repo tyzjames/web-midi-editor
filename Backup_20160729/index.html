@@ -16,12 +16,24 @@
       <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
       <meta name="description" content="MorningstarFX Midi Editor" />
       <script src="controller/controller.js"></script>
+	
+	<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42488299-3', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
       <link href="css/myCSS.css" rel="stylesheet">
    </head>
 
    <body ng-app="myApp">
 		<p>
-			For MC6 Firmware v2.01 and above. If you are looking for the v1 editor, please click <a href="http://editor.midimonitor.com">here</a>
+			<a href="http://www.morningstarengineering.com">Morningstar Engineering</a>
 		</p>
       <header>
          <h2 class="col-md-12 std-grid">
@@ -33,7 +45,8 @@
       <main ng-controller="MidiController as mCtrl" >
          <div class="col-md-12" ng-hide="midiController_isConnected && browserMidiCompatible">
             <h3 style="color:red;">
-               No controllers found. Please connect your Morningstar Midi Controller and click refresh.
+               No controllers found. Please connect your Morningstar Midi Controller and click refresh. </br>
+		If you have other MIDI devices connected to your computer, please unplug them and click refresh.
             </h3>
          </div>
          <div class="col-md-12" ng-hide="browserMidiCompatible">

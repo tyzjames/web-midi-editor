@@ -1,6 +1,10 @@
 (function() {
     var app = angular.module('myApp', []);
-    var midiAccess = null;
+    var midi = null;
+    var hasReceived = false;
+
+    var inputs;
+    var outputs;
 
     app.factory('currentPreset', function() {
         return new midiPreset(0, 0);
@@ -10,7 +14,7 @@
 
         //this.midiTypeSort = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
         this.number = null;
-	    this.name = null;
+	      this.name = null;
         this.midiType = inType.toString();
         this.midiNum1 = inNum1;
         this.midiNum2 = inNum2;
@@ -148,50 +152,30 @@
         {"id":"15", "name":"MC6 Bank Up", "isExp":"false"},
         {"id":"16", "name":"MC6 Bank Down", "isExp":"false"},
         {"id":"17", "name":"Conditional Type", "isExp":"false"},
-		{"id":"18", "name":"System Real Time", "isExp":"false"},
+      	{"id":"18", "name":"System Real Time", "isExp":"false"},
+      	{"id":"19", "name":"AxeFX Tuner", "isExp":"false"},
+        {"id":"20", "name":"SysEx", "isExp":"false"},
+        {"id":"21", "name":"Midi Thru", "isExp":"false"},
+        {"id":"22", "name":"Clear Toggle", "isExp":"false"},
+        {"id":"23", "name":"Blink", "isExp":"false"},
+        {"id":"24", "name":"Set Bank", "isExp":"false"},
         {"id":"0", "name":"Empty", "isExp":"true"},
         {"id":"1", "name":"Expression", "isExp":"true"}
       ];
 
         $scope.currentPreset = currentPreset;
 
-        $scope.saveToPc = function (data, filename) {
-
-          console.log("Saving data");
-          if (!data) {
-            console.error('No data');
-            return;
-          }
-
-          if (!filename) {
-            filename = 'download.mc6Preset';
-          }
-
-          if (typeof data === 'object') {
-            data = JSON.stringify(data, undefined, 2);
-          }
-
-          var blob = new Blob([data], {type: 'text/json'}),
-            e = document.createEvent('MouseEvents'),
-            a = document.createElement('a');
-
-          a.download = filename;
-          a.href = window.URL.createObjectURL(blob);
-          a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-          e.initEvent('click', true, false, window,
-              0, 0, 0, 0, 0, false, false, false, false, 0, null);
-          a.dispatchEvent(e);
-        };
-
         $scope.sendCCMessage = function() {
-            if ($scope.editForm.$valid) {
+            
+            if ($scope.editForm.$valid && hasReceived) {
             console.log("Sending data");
               var presetDataArray = $scope.currentPreset.getPresetDataArray();
               var presetShortNameArray = $scope.currentPreset.getPresetShortNameArray();
               var presetFullNameArray = $scope.currentPreset.getPresetFullNameArray();
               var bankFullNameArray = $scope.currentPreset.getBankFullNameArray();
 
-              for (var output of midiAccess.outputs.values()) {
+              for (var entry of outputs) {
+                var output = entry[1];
                 output.send([0xC0, 0]); // Connect
 
                 output.send([0xB0, 10, $scope.currentPreset.bankNumber]);
@@ -218,70 +202,98 @@
                 }
 
                 output.send([0xC0, 1]); // Disconnect
+                
             }
+          } else if (!hasReceived) {
+            alert("Please select a preset by pressing any switch on your controller first");
           }
+
+         document.getElementById("submitBtn").disabled = true;
+         setTimeout(function() {
+           document.getElementById("submitBtn").disabled = false;
+         }, 1000);
+
         }
 
     }]);
 
     app.controller('MidiController', ['$scope', 'currentPreset', function($scope, currentPreset) {
+        
+        
         $scope.browserMidiCompatible = false;
-		      $scope.midiController_isConnected = false;
+		    $scope.midiController_isConnected = false;
         var connectedDevices = [];
-        angular.element(document).ready(function() {
-            console.log("Ready");
-            midiInit();
-        });
         $scope.currentPreset = currentPreset;
 
-        function midiInit() {
-            if (navigator.requestMIDIAccess) {
-                $scope.$apply(function() {
-                    $scope.browserMidiCompatible = true;
+        angular.element(document).ready(function () {
+            console.log("Ready");
+            midiInit();
+            startInterval();       
+        });
+
+        function startInterval() {
+            setInterval(function () {
+              detectDevice();
+            }, 750);
+        };
+
+        function detectDevice() {
+            var deviceFound = false;
+            for (var input of midi.inputs.values()) {
+                if (checkDeviceName(input.name)) { // Found Morningstar
+                    if (input.connection == "closed") {
+                        $scope.midiController_isConnected = false;
+                        midiInit();
+                    } else {
+                        deviceFound = true;
+                    }
+                }
+            }
+
+            if (!deviceFound) {
+                $scope.$apply(function () {
+                    $scope.midiController_isConnected = false;
                 });
-                console.log("Browser Compatible = true");
-                navigator.requestMIDIAccess().then(onMIDIInit, onMIDIReject);
             } else {
-                console.log("No MIDI support found.");
-                $scope.$apply(function() {
-                    $scope.browserMidiCompatible = false;
-                })
+                $scope.$apply(function () {
+                    $scope.midiController_isConnected = true;
+                });
             }
         }
 
-        $scope.getBrowserCompatibility = function() {
-            return $scope.browserMidiCompatible;
-        };
+        function midiInit() {
+            if (navigator.requestMIDIAccess) {
+                navigator.requestMIDIAccess({ sysex: false }).then(onMIDIInit, onMIDIReject);
+            } else {
+                alert("Platform not compatible");
+            }
+        }
 
-        function onMIDIInit(midi) {
-            midiAccess = midi;
+        function onMIDIInit(midiAccess) {
+            console.log("onMIDIInit");
+            midi = midiAccess;
             $scope.device = {};
-            var inputs = midiAccess.inputs.values();
 
-            for (var input = inputs.next(); input && !input.done; input = inputs.next()) {
-                input.value.onmidimessage = onMIDIMessage;
-            }
+            inputs = midi.inputs;
+            outputs = midi.outputs;
+            connectedDevices.length = 0;
 
-            for (entry of midiAccess.inputs) {
-                var input = entry[1];
-                $scope.device.manufacturer = input.manufacturer;
-                $scope.device.name = input.name;
-                connectedDevices.push($scope.device);
-            }
+            for (entry of outputs) {
+                var port = entry[1];
+                console.log("Midi output -  " + port.manufacturer + " - " + port.name + ": " + port.connection);
+                console.log(port);
+            };
 
-            var isConnected = false;
-            for (var i = 0; i < connectedDevices.length; i++) {
-              if (connectedDevices[i].name.indexOf("Morningstar") > -1 || connectedDevices[i].name.indexOf("Teensy") > -1) {
-                isConnected = true;
-                break;
-              }
-            }
-            $scope.$apply(function() {
-                if (isConnected) {
-                  $scope.midiController_isConnected = true;
-                  console.log($scope.midiController_isConnected);
+            for (entry of inputs) {
+                var port = entry[1];
+                if (checkDeviceName(port.name)) {
+                    port.onmidimessage = onMIDIMessage;
+                    $scope.device.name = port.name;
+                    connectedDevices.push($scope.device);
                 }
-            })
+                console.log("Midi input -  " + port.manufacturer + " - " + port.name + ": " + port.connection);
+                console.log(port);
+            };
         }
 
         function onMIDIReject(err) {
@@ -314,7 +326,7 @@
                   $scope.midiPresetFullNameArray = [];
                   $scope.midiBankNameArray = [];
                   currentProgramMode = 1;
-
+                  hasReceived = true;
                 } else if (midiData_1 === 1) {
                   console.log("Ending connection");
                   /*console.log($scope.midiPresetArray);
@@ -432,6 +444,11 @@
             $scope.currentPreset.bankFullName += String.fromCharCode($scope.midiBankNameArray[i]);
           }
           $scope.currentPreset.bankFullName = $scope.currentPreset.bankFullName.replace(/\s*$/,"");
+        }
+
+        function checkDeviceName(inDeviceName) {
+            if (inDeviceName.indexOf("Morningstar") > -1 || inDeviceName.indexOf("Teensy") > -1) return true;
+            else return false;
         }
 
     }]);
