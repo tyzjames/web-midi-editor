@@ -53,7 +53,7 @@
 
         this.getMaxNumMidiMessages = function() {
           if (this.isExp) {
-            return 4;
+            return 8;   // Set exp msg limit
           }
           return 8;
         }
@@ -133,40 +133,84 @@
 
     app.controller('FormController', ['$scope', 'currentPreset', function($scope, currentPreset) {
 
-      $scope.midiPresetTypes = [
-        {"id":"0", "name":"Empty", "isExp":"false"},
-        {"id":"1", "name":"PC Message", "isExp":"false"},
-        {"id":"2", "name":"CC Message", "isExp":"false"},
-        {"id":"3", "name":"PC Toggle", "isExp":"false"},
-        {"id":"4", "name":"CC Toggle", "isExp":"false"},
-        {"id":"5", "name":"PC Toggle Hold", "isExp":"false"},
-        {"id":"6", "name":"CC Toggle Hold", "isExp":"false"},
-        {"id":"7", "name":"CC Hold Delay", "isExp":"false"},
-        {"id":"8", "name":"Note On", "isExp":"false"},
-        {"id":"9", "name":"Note Off", "isExp":"false"},
-        {"id":"10", "name":"Midi Clock Tap Tempo", "isExp":"false"},
-        {"id":"11", "name":"Strymon Bank Up", "isExp":"false"},
-        {"id":"12", "name":"Strymon Bank Down", "isExp":"false"},
-        {"id":"13", "name":"PC Scroll Up", "isExp":"false"},
-        {"id":"14", "name":"PC Scroll Down", "isExp":"false"},
-        {"id":"15", "name":"MC6 Bank Up", "isExp":"false"},
-        {"id":"16", "name":"MC6 Bank Down", "isExp":"false"},
-        {"id":"17", "name":"Conditional Type", "isExp":"false"},
-      	{"id":"18", "name":"System Real Time", "isExp":"false"},
-      	{"id":"19", "name":"AxeFX Tuner", "isExp":"false"},
-        {"id":"20", "name":"SysEx", "isExp":"false"},
-        {"id":"21", "name":"Midi Thru", "isExp":"false"},
-        {"id":"22", "name":"Clear Toggle", "isExp":"false"},
-        {"id":"23", "name":"Blink", "isExp":"false"},
-        {"id":"24", "name":"Set Bank", "isExp":"false"},
-        {"id":"0", "name":"Empty", "isExp":"true"},
-        {"id":"1", "name":"Expression", "isExp":"true"}
+      $scope.midiPresetTypes =
+      [
+        {
+          "header": "Empty Message",
+          "subheader": [
+            {"id":"0", "name":"Empty", "isExp":"false"}
+          ],
+          "isExp":"false"
+        },
+        {
+          "header": "Standard",
+          "subheader": [
+            {"id":"1", "name":"PC Message", "isExp":"false"},
+            {"id":"2", "name":"CC Message", "isExp":"false"},
+            {"id":"8", "name":"Note On", "isExp":"false"},
+            {"id":"9", "name":"Note Off", "isExp":"false"}
+          ],
+          "isExp":"false"
+        },
+        {
+          "header": "Toggle/Delay",
+          "subheader": [
+            {"id":"3", "name":"PC Toggle", "isExp":"false"},
+            {"id":"4", "name":"CC Toggle", "isExp":"false"},
+            {"id":"5", "name":"PC Toggle Hold", "isExp":"false"},
+            {"id":"6", "name":"CC Toggle Hold", "isExp":"false"},
+            {"id":"7", "name":"CC Hold Delay", "isExp":"false"}
+          ],
+          "isExp":"false"
+        },
+        {
+          "header": "Other",
+          "subheader": [
+            {"id":"10", "name":"Midi Clock Tap Tempo", "isExp":"false"},
+            {"id":"13", "name":"PC Scroll Up", "isExp":"false"},
+            {"id":"14", "name":"PC Scroll Down", "isExp":"false"},
+            {"id":"18", "name":"System Real Time", "isExp":"false"},
+            {"id":"20", "name":"SysEx Message", "isExp":"false"}
+          ],
+          "isExp":"false"
+        },
+        {
+          "header": "Device Specific",
+          "subheader": [
+            {"id":"11", "name":"Strymon Bank Up", "isExp":"false"},
+            {"id":"12", "name":"Strymon Bank Down", "isExp":"false"},
+          	{"id":"19", "name":"AxeFX Tuner", "isExp":"false"},
+          ],
+          "isExp":"false"
+        },
+        {
+          "header": "MC6 Control",
+          "subheader": [
+            {"id":"15", "name":"MC6 Bank Up", "isExp":"false"},
+            {"id":"16", "name":"MC6 Bank Down", "isExp":"false"},
+            {"id":"17", "name":"Conditional Type", "isExp":"false"},
+            {"id":"21", "name":"Set Midi Thru", "isExp":"false"},
+            {"id":"22", "name":"Clear Toggle", "isExp":"false"},
+            {"id":"23", "name":"Blink", "isExp":"false"},
+            {"id":"24", "name":"Set Bank", "isExp":"false"},
+            {"id":"25", "name":"Select Exp Message", "isExp":"false"}
+          ],
+          "isExp":"false"
+        },
+        {
+          "header": "Expression Message",
+          "subheader": [
+            {"id":"0", "name":"Empty", "isExp":"true"},
+            {"id":"1", "name":"Expression", "isExp":"true"}
+          ],
+          "isExp":"true"
+        }
       ];
 
         $scope.currentPreset = currentPreset;
 
         $scope.sendCCMessage = function() {
-            
+
             if ($scope.editForm.$valid && hasReceived) {
             console.log("Sending data");
               var presetDataArray = $scope.currentPreset.getPresetDataArray();
@@ -202,7 +246,7 @@
                 }
 
                 output.send([0xC0, 1]); // Disconnect
-                
+
             }
           } else if (!hasReceived) {
             alert("Please select a preset by pressing any switch on your controller first");
@@ -218,8 +262,8 @@
     }]);
 
     app.controller('MidiController', ['$scope', 'currentPreset', function($scope, currentPreset) {
-        
-        
+
+
         $scope.browserMidiCompatible = false;
 		    $scope.midiController_isConnected = false;
         var connectedDevices = [];
@@ -228,7 +272,7 @@
         angular.element(document).ready(function () {
             console.log("Ready");
             midiInit();
-            startInterval();       
+            startInterval();
         });
 
         function startInterval() {

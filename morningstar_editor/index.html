@@ -1,1 +1,148 @@
-<!DOCTYPE html><html lang="en"><head> <meta charset="utf-8"> <title>Morningstar Web Midi Editor</title> <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script> <meta name="description" content="MorningstarFX Midi Editor"/> <script src="controller/controller.js"></script> <link href="css/myCSS.css" rel="stylesheet"></head><body ng-app="myApp"> <div style="padding-left:300px; padding-right:300px;"> <header> <h4 class="col-xs-12 std-grid std"> Morningstar Engineering Web Midi Editor </h4> </header> <main ng-controller="MidiController as mCtrl"> <div class="alert alert-danger col-xs-12" ng-hide="midiController_isConnected"> <h5> No controllers found. Please connect your Morningstar Midi Controller. </br> If you have other MIDI devices connected, please unplug them before running the application. </h5> </div><div ng-show="midiController_isConnected"> <div> <div class="col-xs-6 std">Bank <br><h2>{{currentPreset.bankNumber + 1}}</h2> </div><div class="col-xs-6 std">{{currentPreset.switchType}}<br><h2>{{currentPreset.getSwitchLabel()}}</h2> </div></div><div> <form ng-controller='FormController as form' name="editForm"> <div class="col-xs-12 input-group preset-name std" style="padding:1px;"> <span class="input-group-addon" id="basic-addon3">Bank Name</span> <input type="text" class="form-control" id="bankName" aria-describedby="basic-addon3" ng-model="currentPreset.bankFullName" maxlength="20" ng-trim='false'> </span> </div><div class="col-xs-12 input-group preset-name std" style="padding:1px;"> <span class="input-group-addon" id="basic-addon3">Preset Full Name</span> <input type="text" class="form-control input-xs" id="presetFullName" aria-describedby="basic-addon3" ng-model="currentPreset.presetFullName" maxlength="16" ng-trim='false'> </span> <span class="input-group-addon" id="basic-addon3">Preset Name</span> <input type="text" class="form-control input-xs" id="presetName" aria-describedby="basic-addon3" ng-model="currentPreset.presetName" maxlength="6" ng-trim='false'> <span class="input-group-btn"> <button class="btn btn-default" id="submitBtn" type="submit" ng-click="sendCCMessage()">Save</button> </span> </div><div> <h6 class="col-xs-3">Type</h6> <h6 class="col-xs-2">N1</h6> <h6 class="col-xs-2">V1</h6> <h6 class="col-xs-2">N2</h6> <h6 class="col-xs-2">V2</h6> <h6 class="col-xs-1">Ch</h6> </div><div ng-repeat="msg in currentPreset.midiMessages" ng-if="msg.number <=currentPreset.getMaxNumMidiMessages()" ng-hide="false"> <div class="col-xs-3 col-height param-input"> <select name="selectMidiType" class="form-control btn-xs form-num input-xs" ng-model="msg.midiType"> <option ng-repeat="option in midiPresetTypes | filter:{isExp: currentPreset.isExp}" value="{{option.id}}">{{option.name}}</option> </select> </div><div class="col-xs-2 col-height param-input input-xs"> <input type="number" class="form-control btn-xs form-num" id="selectMidiNum1" ng-model="msg.midiNum1" required min="0" max="127"/> </div><div class="col-xs-2 col-height param-input input-xs"> <input type="number" class="form-control btn-xs form-num" id="selectMidiV1" ng-model="msg.midiV1" required min="0" max="127"/> </div><div class="col-xs-2 col-height param-input input-xs"> <input type="number" class="form-control btn-xs form-num" id="selectMidiNum2" ng-model="msg.midiNum2" required min="0" max="127"/> </div><div class="col-xs-2 col-height param-input input-xs"> <input type="number" class="form-control btn-xs form-num" id="selectMidiV2" ng-model="msg.midiV2" required min="0" max="127"/> </div><div class="col-xs-1 col-height param-input input-xs"> <input type="number" class="form-control btn-xs form-num" id="selectMidiChannel" ng-model="msg.midiChannel" required min="0" max="16"/> </div></div><br/> </form> </div></div></main> <footer> <div class="col-xs-12 param-input"> <a href="http://www.morningstarfx.com" target="_blank"> <p style="position:relative;top:8px;">Morningstar Engineering 2016 - Web Editor v0.2</p></a> </div><div> <h6>Having trouble connecting? Make sure your MC6 is in Edit mode. Press Sw [A + D] together, and then press Sw [F] to toggle into Edit mode.</h6><h6> As the Web Editor communicates with your device on Midi Channel 1, please ensure that other devices are plugged out or set to a different Midi channel before using the editor. </h6> </div></footer> </div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>Morningstar Web Midi Editor</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+  <meta name="description" content="MorningstarFX Midi Editor" />
+  <script src="controller/controller.js"></script>
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42488299-3', 'auto');
+  ga('send', 'pageview');
+
+  </script>
+
+  <link href="css/myCSS.css" rel="stylesheet">
+</head>
+
+<body ng-app="myApp">
+  <div style="padding-left:300px; padding-right:300px;">
+    <header>
+      <h4 class="col-xs-12 std-grid std">
+        Morningstar Engineering Web Midi Editor
+      </h4>
+    </header>
+
+    <main ng-controller="MidiController as mCtrl">
+      <div class="alert alert-danger col-xs-12" ng-hide="midiController_isConnected">
+        <h5>
+          No controllers found. Please connect your Morningstar Midi Controller. </br>
+          If you have other MIDI devices connected, please unplug them before running the application.
+          </h5>
+      </div>
+
+      <div ng-show="midiController_isConnected">
+        <div>
+          <div class="col-xs-6 std">Bank <br>
+            <h2>
+              {{currentPreset.bankNumber + 1}}
+            </h2>
+          </div>
+          <div class="col-xs-6 std">{{currentPreset.switchType}}<br>
+            <h2>
+              {{currentPreset.getSwitchLabel()}}
+            </h2>
+          </div>
+        </div>
+
+        <div>
+          <form ng-controller='FormController as form' name="editForm">
+
+            <div class="col-xs-12 input-group preset-name std" style="padding:1px;">
+              <span class="input-group-addon" id="basic-addon3">Bank Name</span>
+              <input type="text" class="form-control" id="bankName" aria-describedby="basic-addon3" ng-model="currentPreset.bankFullName"
+                maxlength="20" ng-trim='false'>
+              </span>
+            </div>
+
+            <div class="col-xs-12 input-group preset-name std" style="padding:1px;">
+              <span class="input-group-addon" id="basic-addon3">Preset Full Name</span>
+              <input type="text" class="form-control input-xs" id="presetFullName" aria-describedby="basic-addon3" ng-model="currentPreset.presetFullName"
+                maxlength="16" ng-trim='false'>
+              </span>
+              <span class="input-group-addon" id="basic-addon3">Preset Name</span>
+              <input type="text" class="form-control input-xs" id="presetName" aria-describedby="basic-addon3" ng-model="currentPreset.presetName"
+                maxlength="6" ng-trim='false'>
+              <span class="input-group-btn">
+                    <button class="btn btn-default" id="submitBtn" type="submit" ng-click="sendCCMessage()">Save</button>
+                    </span>
+            </div>
+
+            <div>
+              <h6 class="col-xs-3">Type</h6>
+              <h6 class="col-xs-2">N1</h6>
+              <h6 class="col-xs-2">V1</h6>
+              <h6 class="col-xs-2">N2</h6>
+              <h6 class="col-xs-2">V2</h6>
+              <h6 class="col-xs-1">Ch</h6>
+            </div>
+
+            <div ng-repeat="msg in currentPreset.midiMessages" ng-if="msg.number <= currentPreset.getMaxNumMidiMessages()" ng-hide="false">
+              <div class="col-xs-3 col-height param-input">
+                <!--<select name="selectMidiType" class="form-control btn-xs form-num input-xs" ng-model="msg.midiType">
+                  <option ng-repeat="option in midiPresetTypes | filter:{isExp: currentPreset.isExp}"
+                    value = "{{option.id}}">{{option.name}}</option>
+                </select>-->
+                <select name="selectMidiType" class="form-control btn-xs form-num input-xs" ng-model="msg.midiType">
+                  <optgroup ng-repeat="category in midiPresetTypes | filter:{isExp: currentPreset.isExp}" label="{{category.header}}">
+                    <option ng-repeat="c in category.subheader" value="{{c.id}}">
+                      {{c.name}}
+                    </option>
+                  </optgroup>
+                </select>
+              </div>
+              <div class="col-xs-2 col-height param-input input-xs">
+                <input type="number" class="form-control btn-xs form-num" id="selectMidiNum1" ng-model="msg.midiNum1" required min="0" max="127"
+                />
+              </div>
+              <div class="col-xs-2 col-height param-input input-xs">
+                <input type="number" class="form-control btn-xs form-num" id="selectMidiV1" ng-model="msg.midiV1" required min="0" max="127" />
+              </div>
+              <div class="col-xs-2 col-height param-input input-xs">
+                <input type="number" class="form-control btn-xs form-num" id="selectMidiNum2" ng-model="msg.midiNum2" required min="0" max="127"
+                />
+              </div>
+              <div class="col-xs-2 col-height param-input input-xs">
+                <input type="number" class="form-control btn-xs form-num" id="selectMidiV2" ng-model="msg.midiV2" required min="0" max="127" />
+              </div>
+              <div class="col-xs-1 col-height param-input input-xs">
+                <input type="number" class="form-control btn-xs form-num" id="selectMidiChannel" ng-model="msg.midiChannel" required min="0" max="16"
+                />
+              </div>
+            </div>
+
+            <br/>
+          </form>
+        </div>
+
+      </div>
+    </main>
+    <footer>
+      <div class="col-xs-12 param-input">
+        <a href="http://www.morningstarfx.com" target="_blank">
+          <p style="position:relative;top:8px;">Morningstar Engineering 2016 - Web Editor v0.2</p>
+        </a>
+      </div>
+      <div>
+        <h6>Having trouble connecting? Make sure your MC6 is in Edit mode. Press Sw [A + D] together, and then press Sw [F] to
+          toggle into Edit mode.</h6>
+          <h6>
+            As the Web Editor communicates with your device on Midi Channel 1, please ensure that other devices are plugged out or set to
+            a different Midi channel before using the editor.
+          </h6>
+      </div>
+    </footer>
+    </div>
+</body>
+
+</html>
